@@ -1,0 +1,8 @@
+{
+  "name": "Final ACE Sprint mgt",
+  "description": "ACE Compliance Portal \u0026 Operations Hub for Systems Department with Request Register, Sprint Tracker, Reports, Soft Delete Lifecycle, and Excel Import/Export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
