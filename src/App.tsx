@@ -81,17 +81,18 @@ export default function App() {
   const [isSidebarOpenMobile, setIsSidebarOpenMobile] = useState(false);
 
   // Core Data States
-  const [requests, setRequests] = useState<ComplianceRequest[]>(() => loadRequests());
-  const [bugs, setBugs] = useState<BugRequest[]>(() => loadBugs());
-  const [tickets, setTickets] = useState<SprintTicket[]>(() => loadTickets());
-  const [completedRecords, setCompletedRecords] = useState<CompletedRecord[]>(() => loadCompleted());
-  const [deletedItems, setDeletedItems] = useState<DeletedItem[]>(() => loadDeletedItems());
-  const [customStatuses, setCustomStatuses] = useState<CustomStatus[]>(() => loadStatuses());
-  const [systemUsers, setSystemUsers] = useState<SystemUser[]>(() => loadUsers());
-  const [activityFeed, setActivityFeed] = useState<ActivityFeedItem[]>(() => loadActivities());
-  const [sprints, setSprints] = useState<string[]>(() => loadSprints());
-  const [watchedIds, setWatchedIds] = useState<string[]>(() => loadWatchedIds());
-  const [customTasks, setCustomTasks] = useState<CustomTask[]>(() => loadCustomTasks());
+  const [requests, setRequests] = useState<ComplianceRequest[]>([]);
+  const [bugs, setBugs] = useState<BugRequest[]>([]);
+  const [tickets, setTickets] = useState<SprintTicket[]>([]);
+  const [completedRecords, setCompletedRecords] = useState<CompletedRecord[]>([]);
+  const [deletedItems, setDeletedItems] = useState<DeletedItem[]>([]);
+  const [customStatuses, setCustomStatuses] = useState<CustomStatus[]>([]);
+  const [systemUsers, setSystemUsers] = useState<SystemUser[]>([]);
+  const [activityFeed, setActivityFeed] = useState<ActivityFeedItem[]>([]);
+  const [sprints, setSprints] = useState<string[]>([]);
+  const [watchedIds, setWatchedIds] = useState<string[]>([]);
+  const [customTasks, setCustomTasks] = useState<CustomTask[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Modal States
   const [detailItem, setDetailItem] = useState<ComplianceRequest | SprintTicket | CompletedRecord | BugRequest | null>(null);
@@ -168,23 +169,49 @@ export default function App() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session) {
+        fetchData();
+      } else {
+        setIsLoading(false);
+      }
     });
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session) {
+        fetchData();
+      } else {
+        setIsLoading(false);
+      }
     });
 
-    setRequests(loadRequests());
-    setBugs(loadBugs());
-    setTickets(loadTickets());
-    setCompletedRecords(loadCompleted());
-    setDeletedItems(loadDeletedItems());
-    setCustomStatuses(loadStatuses());
-    setSystemUsers(loadUsers());
-    setActivityFeed(loadActivities());
-    setSprints(loadSprints());
-    setWatchedIds(loadWatchedIds());
-    setCustomTasks(loadCustomTasks());
+    async function fetchData() {
+      setIsLoading(true);
+      const [
+        loadedRequests, loadedBugs, loadedTickets, loadedCompleted, loadedDeleted,
+        loadedStatuses, loadedUsers, loadedActivities, loadedSprints, loadedWatched, loadedTasks
+      ] = await Promise.all([
+        loadRequests(), loadBugs(), loadTickets(), loadCompleted(), loadDeletedItems(),
+        loadStatuses(), loadUsers(), loadActivities(), loadSprints(), loadWatchedIds(), loadCustomTasks()
+      ]);
+
+      setRequests(loadedRequests);
+      setBugs(loadedBugs);
+      setTickets(loadedTickets);
+      setCompletedRecords(loadedCompleted);
+      setDeletedItems(loadedDeleted);
+      setCustomStatuses(loadedStatuses);
+      setSystemUsers(loadedUsers);
+      setActivityFeed(loadedActivities);
+      setSprints(loadedSprints);
+      setWatchedIds(loadedWatched);
+      setCustomTasks(loadedTasks);
+      setIsLoading(false);
+    }
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // ==================== MY WATCHLIST OPERATIONAL HANDLERS ====================
@@ -1726,6 +1753,18 @@ export default function App() {
 
   if (!session) {
     return <Auth />;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-700">Loading Workspace...</h2>
+          <p className="text-gray-500">Connecting to secure database</p>
+        </div>
+      </div>
+    );
   }
 
   return (
