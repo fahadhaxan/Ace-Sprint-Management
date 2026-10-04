@@ -187,26 +187,31 @@ export default function App() {
     });
 
     async function fetchData() {
-      const [
-        loadedRequests, loadedBugs, loadedTickets, loadedCompleted, loadedDeleted,
-        loadedStatuses, loadedUsers, loadedActivities, loadedSprints, loadedWatched, loadedTasks
-      ] = await Promise.all([
-        loadRequests(), loadBugs(), loadTickets(), loadCompleted(), loadDeletedItems(),
-        loadStatuses(), loadUsers(), loadActivities(), loadSprints(), loadWatchedIds(), loadCustomTasks()
-      ]);
+      try {
+        const [
+          loadedRequests, loadedBugs, loadedTickets, loadedCompleted, loadedDeleted,
+          loadedStatuses, loadedUsers, loadedActivities, loadedSprints, loadedWatched, loadedTasks
+        ] = await Promise.all([
+          loadRequests(), loadBugs(), loadTickets(), loadCompleted(), loadDeletedItems(),
+          loadStatuses(), loadUsers(), loadActivities(), loadSprints(), loadWatchedIds(), loadCustomTasks()
+        ]);
 
-      setRequests(loadedRequests);
-      setBugs(loadedBugs);
-      setTickets(loadedTickets);
-      setCompletedRecords(loadedCompleted);
-      setDeletedItems(loadedDeleted);
-      setCustomStatuses(loadedStatuses);
-      setSystemUsers(loadedUsers);
-      setActivityFeed(loadedActivities);
-      setSprints(loadedSprints);
-      setWatchedIds(loadedWatched);
-      setCustomTasks(loadedTasks);
-      setIsLoading(false);
+        setRequests(loadedRequests);
+        setBugs(loadedBugs);
+        setTickets(loadedTickets);
+        setCompletedRecords(loadedCompleted);
+        setDeletedItems(loadedDeleted);
+        setCustomStatuses(loadedStatuses);
+        setSystemUsers(loadedUsers);
+        setActivityFeed(loadedActivities);
+        setSprints(loadedSprints);
+        setWatchedIds(loadedWatched);
+        setCustomTasks(loadedTasks);
+      } catch (error) {
+        console.error("Error loading workspace data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     return () => {
