@@ -404,16 +404,15 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
               className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 border border-slate-300 rounded-lg text-xs font-bold text-slate-800"
             >
               <span>{sp}</span>
-              {sprints.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => handleDeleteSprint(sp)}
-                  className="text-slate-400 hover:text-red-700 cursor-pointer"
-                  title="Remove Sprint"
-                >
-                  &times;
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => handleDeleteSprint(sp)}
+                disabled={sprints.length <= 1}
+                className={`cursor-pointer ${sprints.length <= 1 ? 'text-slate-200 cursor-not-allowed' : 'text-slate-400 hover:text-red-700'}`}
+                title={sprints.length <= 1 ? "Cannot delete the last remaining sprint" : "Remove Sprint"}
+              >
+                &times;
+              </button>
             </div>
           ))}
         </div>
