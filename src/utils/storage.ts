@@ -277,3 +277,22 @@ export async function resetAllToDefault() {
     customTasks: [],
   };
 }
+
+export async function deleteRecord(table: string, matchColumn: string, matchValue: string): Promise<void> {
+  try {
+    const { error } = await supabase.from(table).delete().eq(matchColumn, matchValue);
+    if (error) throw error;
+  } catch (err) {
+    console.error(`Failed to delete record from ${table}`, err);
+  }
+}
+
+export async function deleteRecords(table: string, matchColumn: string, matchValues: string[]): Promise<void> {
+  try {
+    if (matchValues.length === 0) return;
+    const { error } = await supabase.from(table).delete().in(matchColumn, matchValues);
+    if (error) throw error;
+  } catch (err) {
+    console.error(`Failed to delete records from ${table}`, err);
+  }
+}

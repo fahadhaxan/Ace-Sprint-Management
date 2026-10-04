@@ -24,6 +24,8 @@ interface AdminSettingsTabProps {
   sprints: string[];
   onUpdateStatuses: (statuses: CustomStatus[]) => void;
   onUpdateSprints: (sprints: string[]) => void;
+  onDeleteStatus: (id: string) => void;
+  onDeleteSprint: (sprintToRemove: string) => void;
   onResetAllData: () => void;
 }
 
@@ -44,6 +46,8 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
   sprints,
   onUpdateStatuses,
   onUpdateSprints,
+  onDeleteStatus,
+  onDeleteSprint,
   onResetAllData,
 }) => {
   // Status Configurator Form
@@ -127,6 +131,7 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
   const handleDeleteStatus = (id: string) => {
     const updated = statuses.filter((s) => s.id !== id);
     onUpdateStatuses(updated);
+    onDeleteStatus(id);
   };
 
   const handleAddSprint = (e: React.FormEvent) => {
@@ -141,6 +146,7 @@ export const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({
   const handleDeleteSprint = (sprintToRemove: string) => {
     if (sprints.length <= 1) return;
     onUpdateSprints(sprints.filter((s) => s !== sprintToRemove));
+    onDeleteSprint(sprintToRemove);
   };
 
   return (

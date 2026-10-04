@@ -35,10 +35,11 @@ import {
   resetAllToDefault,
   loadBugs,
   saveBugs,
-  loadWatchedIds,
   saveWatchedIds,
   loadCustomTasks,
-  saveCustomTasks
+  saveCustomTasks,
+  deleteRecord,
+  deleteRecords
 } from './utils/storage';
 import { ParsedWorkbookResult, parseExcelFile } from './utils/excel';
 import { supabase } from './utils/supabase';
@@ -186,7 +187,6 @@ export default function App() {
     });
 
     async function fetchData() {
-      setIsLoading(true);
       const [
         loadedRequests, loadedBugs, loadedTickets, loadedCompleted, loadedDeleted,
         loadedStatuses, loadedUsers, loadedActivities, loadedSprints, loadedWatched, loadedTasks
@@ -325,6 +325,7 @@ export default function App() {
 
     setRequests(updatedRequests);
     saveRequests(updatedRequests);
+    deleteRecord('compliance_requests', 'id', req.id);
     setDeletedItems(updatedDeletedList);
     saveDeletedItems(updatedDeletedList);
 
@@ -357,6 +358,7 @@ export default function App() {
 
     setRequests(remaining);
     saveRequests(remaining);
+    deleteRecords('compliance_requests', 'id', reqIds);
     setDeletedItems(updatedDeletedList);
     saveDeletedItems(updatedDeletedList);
 
@@ -459,6 +461,7 @@ export default function App() {
 
     setBugs(updatedBugs);
     saveBugs(updatedBugs);
+    deleteRecord('bug_requests', 'id', bug.id);
     setDeletedItems(updatedDeletedList);
     saveDeletedItems(updatedDeletedList);
 
@@ -492,6 +495,7 @@ export default function App() {
 
     setBugs(remaining);
     saveBugs(remaining);
+    deleteRecords('bug_requests', 'id', bugIds);
     setDeletedItems(updatedDeletedList);
     saveDeletedItems(updatedDeletedList);
 
@@ -524,6 +528,7 @@ export default function App() {
     const updatedCompleted = [completedRecord, ...completedRecords];
     setBugs(updatedBugs);
     saveBugs(updatedBugs);
+    deleteRecord('bug_requests', 'id', bug.id);
     setCompletedRecords(updatedCompleted);
     saveCompleted(updatedCompleted);
 
@@ -559,6 +564,7 @@ export default function App() {
 
     setBugs(remaining);
     saveBugs(remaining);
+    deleteRecords('bug_requests', 'id', bugIds);
     setCompletedRecords(updatedCompleted);
     saveCompleted(updatedCompleted);
 
@@ -620,6 +626,7 @@ export default function App() {
 
     setTickets(updatedTickets);
     saveTickets(updatedTickets);
+    deleteRecord('sprint_tickets', 'id', ticket.id);
     setDeletedItems(updatedDeletedList);
     saveDeletedItems(updatedDeletedList);
 
@@ -652,6 +659,7 @@ export default function App() {
 
     setTickets(remaining);
     saveTickets(remaining);
+    deleteRecords('sprint_tickets', 'id', ticketIds);
     setDeletedItems(updatedDeletedList);
     saveDeletedItems(updatedDeletedList);
 
@@ -1351,6 +1359,7 @@ export default function App() {
 
     setCompletedRecords(updatedCompleted);
     saveCompleted(updatedCompleted);
+    deleteRecord('completed_records', 'id', record.id);
     setDeletedItems(updatedDeletedList);
     saveDeletedItems(updatedDeletedList);
 
@@ -1383,6 +1392,7 @@ export default function App() {
 
     setCompletedRecords(remaining);
     saveCompleted(remaining);
+    deleteRecords('completed_records', 'id', recordIds);
     setDeletedItems(updatedDeletedList);
     saveDeletedItems(updatedDeletedList);
 
@@ -1436,6 +1446,7 @@ export default function App() {
     const updatedDeleted = deletedItems.filter((d) => d.id !== id);
     setDeletedItems(updatedDeleted);
     saveDeletedItems(updatedDeleted);
+    deleteRecord('deleted_items', 'id', id);
 
     addToast({
       type: 'info',
@@ -1488,8 +1499,12 @@ export default function App() {
   };
 
   const handleEmptyTrash = () => {
+    const allDeletedIds = deletedItems.map((d) => d.id);
     setDeletedItems([]);
     saveDeletedItems([]);
+    if (allDeletedIds.length > 0) {
+      deleteRecords('deleted_items', 'id', allDeletedIds);
+    }
     addToast({
       type: 'info',
       title: 'Trash Emptied',
@@ -1556,6 +1571,7 @@ export default function App() {
     const updated = systemUsers.filter((u) => u.id !== userId);
     setSystemUsers(updated);
     saveUsers(updated);
+    deleteRecord('system_users', 'id', userId);
     addToast({
       type: 'info',
       title: 'User Removed',
@@ -1815,6 +1831,8 @@ export default function App() {
           deletedCount={deletedItems.length}
           isOpenMobile={isSidebarOpenMobile}
           onCloseMobile={() => setIsSidebarOpenMobile(false)}
+          userEmail={session?.user?.email}
+          onLogout={() => supabase.auth.signOut()}
         />
 
         {/* Main Content Area */}
@@ -1982,6 +2000,8 @@ export default function App() {
               sprints={sprints}
               onUpdateStatuses={handleUpdateStatuses}
               onUpdateSprints={handleUpdateSprints}
+              onDeleteStatus={(id) => deleteRecord('custom_statuses', 'id', id)}
+              onDeleteSprint={(sprint) => deleteRecord('sprints', 'name', sprint)}
               onResetAllData={handleResetAllData}
             />
           )}

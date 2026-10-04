@@ -27,6 +27,8 @@ interface SidebarNavProps {
   deletedCount: number;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
+  userEmail?: string;
+  onLogout?: () => void;
 }
 
 export const SidebarNav: React.FC<SidebarNavProps> = ({
@@ -34,6 +36,8 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
   onSelectTab,
   isOpenMobile,
   onCloseMobile,
+  userEmail,
+  onLogout,
 }) => {
   const navItems = [
     {
@@ -150,17 +154,25 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
       <div className="p-4 border-t border-slate-200/50 bg-white/30 space-y-3">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-red-800 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
-            AC
+            {userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}
           </div>
           <div className="min-w-0 flex-1">
             <span className="block text-xs font-bold text-slate-900 truncate">
-              ACE Systems Admin
+              {userEmail ? userEmail.split('@')[0] : 'User'}
             </span>
             <span className="block text-[10px] text-slate-500 truncate">
-              ace-368@acehrm.net
+              {userEmail || 'No User'}
             </span>
           </div>
         </div>
+        {onLogout && (
+          <button 
+            onClick={onLogout}
+            className="w-full mt-2 py-1.5 px-3 bg-white hover:bg-red-50 text-red-700 text-xs font-semibold rounded border border-slate-200 transition-colors cursor-pointer"
+          >
+            Logout
+          </button>
+        )}
       </div>
     </div>
   );
