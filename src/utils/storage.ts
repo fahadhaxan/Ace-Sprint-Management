@@ -200,7 +200,8 @@ export async function saveSprints(sprints: string[]): Promise<void> {
   try {
     // Convert strings to objects for upsert
     const { error } = await supabase.from('sprints').upsert(
-      sprints.map(name => ({ name }))
+      sprints.map(name => ({ name })),
+      { onConflict: 'name' }
     );
     if (error) throw error;
   } catch (err) {

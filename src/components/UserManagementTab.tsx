@@ -27,6 +27,7 @@ interface UserManagementTabProps {
   onUpdateUserStatus: (userId: string, newStatus: UserStatus) => void;
   onAddUser: (user: SystemUser) => void;
   onDeleteUser: (userId: string) => void;
+  currentUserEmail?: string;
 }
 
 export const UserManagementTab: React.FC<UserManagementTabProps> = ({
@@ -35,6 +36,7 @@ export const UserManagementTab: React.FC<UserManagementTabProps> = ({
   onUpdateUserStatus,
   onAddUser,
   onDeleteUser,
+  currentUserEmail,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
@@ -330,7 +332,7 @@ export const UserManagementTab: React.FC<UserManagementTabProps> = ({
 
                       {/* Delete User */}
                       <td className="py-3 px-4 text-center">
-                        {user.email !== 'ace-368@acehrm.net' ? (
+                        {user.email !== currentUserEmail ? (
                           <button
                             type="button"
                             onClick={() => onDeleteUser(user.id)}
@@ -340,7 +342,7 @@ export const UserManagementTab: React.FC<UserManagementTabProps> = ({
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         ) : (
-                          <span className="text-[10px] text-slate-400 italic">Protected</span>
+                          <span className="text-[10px] text-slate-400 italic">Protected (You)</span>
                         )}
                       </td>
 

@@ -35,6 +35,7 @@ import {
   resetAllToDefault,
   loadBugs,
   saveBugs,
+  loadWatchedIds,
   saveWatchedIds,
   loadCustomTasks,
   saveCustomTasks,
@@ -156,7 +157,7 @@ export default function App() {
       type,
       title,
       details,
-      actor: 'ACE Systems Admin',
+      actor: session?.user?.email ? session.user.email.split('@')[0] : 'ACE Systems Admin',
       referenceId,
     };
     setActivityFeed((prev) => {
@@ -164,7 +165,7 @@ export default function App() {
       saveActivities(updated);
       return updated;
     });
-  }, []);
+  }, [session]);
 
   // Initial Data Load
   useEffect(() => {
@@ -2019,6 +2020,7 @@ export default function App() {
               onUpdateUserStatus={handleUpdateUserStatus}
               onAddUser={handleAddUser}
               onDeleteUser={handleDeleteUser}
+              currentUserEmail={session?.user?.email}
             />
           )}
 
